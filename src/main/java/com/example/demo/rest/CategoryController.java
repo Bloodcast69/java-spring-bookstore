@@ -1,35 +1,43 @@
 package com.example.demo.rest;
 
+import com.example.demo.dto.CategoryBaseGetDto;
+import com.example.demo.dto.CategoryCreateDto;
 import com.example.demo.dto.CategoryGetDto;
-import com.example.demo.mapper.CategoryMapper;
-import com.example.demo.repository.Category;
-import com.example.demo.repository.CategoryRepository;
+import com.example.demo.service.CategoryService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CategoryController {
-    private final CategoryRepository repository;
-    private final CategoryMapper mapper;
-    public CategoryController(CategoryRepository repository, CategoryMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
+    private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/category/{id}")
     public ResponseEntity<CategoryGetDto> getCategoryById(@PathVariable(name = "id") long id) {
-        Optional<Category> entity = repository.findById(id);
+        CategoryGetDto response = categoryService.getCategoryById(id);
 
-        if (entity.isEmpty()) {
+        if (response == null) {
             return ResponseEntity.notFound().build();
         }
 
-        CategoryGetDto response = mapper.categoryToCategoryGetDto(entity.get());
-
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/category")
+    public ResponseEntity<CategoryBaseGetDto> createCategory( @RequestBody CategoryCreateDto body) {
+        System.out.println("Category create");
+        CategoryBaseGetDto response = categoryService.createCategory(body);
+        System.out.println("Category created");
+        if (response == null) {
+            System.out.println("Null response bad request");
+            return ResponseEntity.badRequest().build();
+        }
+        System.out.println("Returning");
+        return new ResponseEntity<CategoryBaseGetDto>(response, HttpStatus.CREATED);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.demo.mapper;
 
 import com.example.demo.dto.BookBaseGetDto;
+import com.example.demo.dto.CategoryBaseGetDto;
 import com.example.demo.dto.CategoryGetDto;
 import com.example.demo.repository.Category;
 import org.springframework.stereotype.Service;
@@ -21,5 +22,9 @@ public class CategoryMapper {
                 .toList();
 
         return new CategoryGetDto(category.getId(), category.getName(), books);
+    }
+
+    public CategoryBaseGetDto categoryToCategoryBaseGetDto(Category category) {
+        return new CategoryBaseGetDto(category.getId(), category.getName());
     }
 }
