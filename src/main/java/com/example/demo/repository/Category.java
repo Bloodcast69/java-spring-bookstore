@@ -1,6 +1,5 @@
 package com.example.demo.repository;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -16,7 +15,6 @@ public class Category {
     private String name;
 
     @OneToMany(mappedBy = "category")
-//    @JsonIgnoreProperties("category")
     private List<Book> books;
 
     protected Category() {
@@ -38,5 +36,4 @@ public class Category {
     public List<Book> getBooks() {
         return books;
     }
-
 }

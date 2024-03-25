@@ -1,7 +1,7 @@
 package com.example.demo.mapper;
 
 import com.example.demo.dto.BookGetDto;
-import com.example.demo.dto.CategoryGetDto;
+import com.example.demo.dto.CategoryBaseGetDto;
 import com.example.demo.repository.Book;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ public class BookMapper {
         return new BookGetDto(
                 book.getId(),
                 book.getName(),
-                new CategoryGetDto(
+                new CategoryBaseGetDto(
                         book.getCategory().getId(),
                         book.getCategory().getName()
                 )

@@ -2,26 +2,15 @@ package com.example.demo.dto;
 
 import java.util.List;
 
-public class CategoryGetDto {
-    private long id;
-    private String name;
-//    private List<BookGetDto> books;
+public class CategoryGetDto extends CategoryBaseGetDto {
+    private final List<BookBaseGetDto> books;
 
-    public CategoryGetDto(long id, String name) {
-        this.id = id;
-        this.name = name;
-//        this.books = books;
+    public CategoryGetDto(long id, String name, List<BookBaseGetDto> books) {
+        super(id, name);
+        this.books = books;
     }
 
-    public long getId() {
-        return id;
+    public List<BookBaseGetDto> getBooks() {
+        return books;
     }
-
-    public String getName() {
-        return name;
-    }
-
-//    public List<BookGetDto> getBooks() {
-//        return books;
-//    }
 }

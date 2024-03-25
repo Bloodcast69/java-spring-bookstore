@@ -1,25 +1,14 @@
 package com.example.demo.dto;
 
-public class BookGetDto {
-    private long id;
-    private String name;
-    private CategoryGetDto category;
+public class BookGetDto extends BookBaseGetDto {
+    private final CategoryBaseGetDto category;
 
-    public BookGetDto(long id, String name, CategoryGetDto category) {
-        this.id = id;
-        this.name = name;
+    public BookGetDto(long id, String name, CategoryBaseGetDto category) {
+        super(id, name);
         this.category = category;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public CategoryGetDto getCategory() {
+    public CategoryBaseGetDto getCategory() {
         return category;
     }
 
