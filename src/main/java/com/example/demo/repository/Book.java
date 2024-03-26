@@ -2,11 +2,14 @@ package com.example.demo.repository;
 
 import jakarta.persistence.*;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
+
 @Entity
 @Table(name = "book")
 public class Book {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
@@ -35,5 +38,9 @@ public class Book {
 
     public Category getCategory() {
         return category;
+    }
+
+    public void clearCategory() {
+        this.category = null;
     }
 }

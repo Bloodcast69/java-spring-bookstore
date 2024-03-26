@@ -12,6 +12,7 @@ public class BookMapper {
                 book.getId(),
                 book.getName(),
                 new CategoryBaseGetDto(
+                        // TU JEST BŁĄD, próba pobrania kategorii z pustym id
                         book.getCategory().getId(),
                         book.getCategory().getName()
                 )

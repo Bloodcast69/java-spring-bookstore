@@ -1,8 +1,6 @@
 package com.example.demo.rest;
 
-import com.example.demo.dto.CategoryBaseGetDto;
-import com.example.demo.dto.CategoryCreateDto;
-import com.example.demo.dto.CategoryGetDto;
+import com.example.demo.dto.*;
 import com.example.demo.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -29,15 +27,35 @@ public class CategoryController {
     }
 
     @PostMapping("/category")
-    public ResponseEntity<CategoryBaseGetDto> createCategory( @RequestBody CategoryCreateDto body) {
-        System.out.println("Category create");
+    public ResponseEntity<CategoryBaseGetDto> createCategory(@RequestBody @Valid CategoryCreateDto body) {
         CategoryBaseGetDto response = categoryService.createCategory(body);
-        System.out.println("Category created");
+
         if (response == null) {
-            System.out.println("Null response bad request");
             return ResponseEntity.badRequest().build();
         }
-        System.out.println("Returning");
+
         return new ResponseEntity<CategoryBaseGetDto>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/category/{id}")
+    public ResponseEntity<CategoryBaseGetDto> updateCategory(@PathVariable(name = "id") long id, @RequestBody @Valid CategoryUpdateDto body) {
+        CategoryBaseGetDto response = categoryService.updateCategory(id, body);
+
+        if (response == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return new ResponseEntity<CategoryBaseGetDto>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/category/{id}")
+    public ResponseEntity<CategoryBaseGetDto> deleteCategory(@PathVariable(name = "id") long id, @RequestBody @Valid CategoryDeleteDto body) {
+        CategoryBaseGetDto response = categoryService.deleteCategory(id, body);
+
+        if (response == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return new ResponseEntity<CategoryBaseGetDto>(response, HttpStatus.OK);
     }
 }

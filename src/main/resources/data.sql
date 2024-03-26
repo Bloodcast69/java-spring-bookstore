@@ -1,3 +1,3 @@
-insert into category (id, name) values (1, 'Kryminal');
-insert into book (id, name, category_id) values (1, 'Morderstwo w Orient Express', 1);
-insert into book (id, name, category_id) values (2, 'Ojciec Chrzestny', 1);
+insert into category (name) values ('Kryminal');
+insert into book (name, category_id) values ('Morderstwo w Orient Express', 1);
+insert into book (name, category_id) values ('Ojciec Chrzestny', 1);

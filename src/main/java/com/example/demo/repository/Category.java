@@ -8,7 +8,7 @@ import java.util.List;
 @Table(name = "category")
 public class Category {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false, unique = true)
@@ -35,5 +35,13 @@ public class Category {
 
     public List<Book> getBooks() {
         return books;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
     }
 }
