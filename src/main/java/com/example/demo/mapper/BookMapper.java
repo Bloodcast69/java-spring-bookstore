@@ -11,9 +11,9 @@ public class BookMapper {
         return new BookGetDto(
                 book.getId(),
                 book.getName(),
+                book.categoryIsEmpty() ? null :
                 new CategoryBaseGetDto(
-                        // TU JEST BŁĄD, próba pobrania kategorii z pustym id
-                        book.getCategory().getId(),
+                        book.getId(),
                         book.getCategory().getName()
                 )
         );

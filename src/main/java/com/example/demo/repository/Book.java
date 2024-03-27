@@ -2,9 +2,6 @@ package com.example.demo.repository;
 
 import jakarta.persistence.*;
 
-import javax.swing.text.html.Option;
-import java.util.Optional;
-
 @Entity
 @Table(name = "book")
 public class Book {
@@ -42,5 +39,9 @@ public class Book {
 
     public void clearCategory() {
         this.category = null;
+    }
+
+    public boolean categoryIsEmpty() {
+        return this.category == null;
     }
 }
