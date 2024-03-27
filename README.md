@@ -5,6 +5,7 @@ Services:
 
 Endpoints:
 1. Book:
+
    2. GET http://localhost:8080/book/{id} - getBookById
    
    3. GET http://localhost:8080/books/{id} - getBooksByCategoryId
@@ -16,6 +17,7 @@ Endpoints:
    6. DELETE TBD
    
 2. Category:
+
    3. GET http://localhost:8080/category/{id} - getCategoryById
    
    4. POST http://localhost:8080/category - createCategory
