@@ -1,12 +1,13 @@
 package com.example.demo.rest;
 
+import com.example.demo.dto.BookBaseGetDto;
+import com.example.demo.dto.BookCreateDto;
 import com.example.demo.dto.BookGetDto;
+import com.example.demo.dto.BookUpdateDto;
 import com.example.demo.service.BookService;
 import com.example.demo.service.CategoryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,12 +34,33 @@ public class BookController {
     }
 
     @GetMapping("/books/{categoryId}")
-    public ResponseEntity<List<BookGetDto>> getBooksByCategoryId(@PathVariable(name = "categoryId") long categoryId) {
-        List<BookGetDto> response = bookService.getBooksByCategoryId(categoryId);
+    public ResponseEntity<List<BookBaseGetDto>> getBooksByCategoryId(@PathVariable(name = "categoryId") long categoryId) {
+        List<BookBaseGetDto> response = bookService.getBooksByCategoryId(categoryId);
 
         if (response == null) {
             return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/book")
+    public ResponseEntity<BookGetDto> createBook(@RequestBody BookCreateDto body) {
+        BookGetDto response = bookService.createBook(body);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/book/{id}")
+    public ResponseEntity<BookGetDto> updateBook(@RequestBody BookUpdateDto body) {
+        BookGetDto response = bookService.updateBook(body);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/book/{id}")
+    public ResponseEntity<BookGetDto> deleteBook(@PathVariable(name = "id") long id) {
+        BookGetDto response = bookService.deleteBook(id);
 
         return ResponseEntity.ok(response);
     }

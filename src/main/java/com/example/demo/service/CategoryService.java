@@ -2,61 +2,65 @@ package com.example.demo.service;
 
 import com.example.demo.dto.*;
 import com.example.demo.mapper.CategoryMapper;
-import com.example.demo.repository.Book;
+import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.Category;
 import com.example.demo.repository.CategoryRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryService {
-    private CategoryRepository repository;
+    private final CategoryRepository repository;
+    private final BookRepository bookRepository;
     private final CategoryMapper mapper;
-    public CategoryService(CategoryRepository repository, CategoryMapper mapper) {
+
+    public CategoryService(CategoryRepository repository, BookRepository bookRepository, CategoryMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
+        this.bookRepository = bookRepository;
     }
 
     @Transactional
     public CategoryGetDto getCategoryById(long id) {
-        Optional<Category> entity = repository.findById(id);
+        Category entity = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
-        if (entity.isEmpty()) {
-            return null;
-        }
+        return mapper.categoryToCategoryGetDto(entity);
+    }
 
-        return mapper.categoryToCategoryGetDto(entity.get());
+    @Transactional
+    public Category getFullCategoryById(long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
+    }
+
+    @Transactional
+    public List<CategoryGetDto> getAllCategories() {
+        return mapper.categoryListToCategoryGetDtoList(repository.findAll());
     }
 
     @Transactional
     public CategoryBaseGetDto createCategory(CategoryCreateDto body) {
-        Category existingCategory = repository.findByName(body.getName());
+        Category entity;
 
-        if (existingCategory != null) {
-            return null;
+        try {
+            entity = repository.save(new Category(body.getName()));
+        } catch (DataIntegrityViolationException ex) {
+            throw new DataIntegrityViolationException("Category with name " + body.getName() + " already exists.");
         }
 
-        Category entity = repository.save(new Category(body.getName()));
-
         return mapper.categoryToCategoryBaseGetDto(entity);
-
     }
 
     @Transactional
     public CategoryBaseGetDto updateCategory(long id, CategoryUpdateDto body) {
-        Optional<Category> existingCategory = repository.findById(id);
+        Category existingCategory = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
-        if (existingCategory.isEmpty()) {
-            return null;
-        }
+        existingCategory.setName(body.getName());
 
-        existingCategory.get().setName(body.getName());
-
-        Category entity = repository.save(existingCategory.get());
-
+        Category entity = repository.save(existingCategory);
 
         return mapper.categoryToCategoryBaseGetDto(entity);
 
@@ -64,25 +68,19 @@ public class CategoryService {
 
     @Transactional
     public CategoryBaseGetDto deleteCategory(long id, CategoryDeleteDto body) {
-        Optional<Category> existingCategory = repository.findById(id);
+        Category existingCategory = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
-        if (existingCategory.isEmpty()) {
-            return null;
-        }
-
-        List<Book> categoryBooks = existingCategory.get().getBooks();
-
-        if (!categoryBooks.isEmpty() && body.getForce()) {
+        if (!existingCategory.getBooks().isEmpty() && body.getForce()) {
             // remove books from category
-            categoryBooks.forEach(book -> book.clearCategory());
-            existingCategory.get().setBooks(categoryBooks);
-            repository.save(existingCategory.get());
-            // remove category
-            repository.deleteById(id);
-        } else if (categoryBooks.isEmpty()) {
-            repository.delete(existingCategory.get());
-        }
+            existingCategory.getBooks().forEach(book -> {
+                book.setCategory(null);
+                bookRepository.save(book);
+            });
 
-        return mapper.categoryToCategoryBaseGetDto(existingCategory.get());
+            existingCategory.getBooks().clear();
+        }
+        repository.delete(existingCategory);
+
+        return mapper.categoryToCategoryBaseGetDto(existingCategory);
     }
 }

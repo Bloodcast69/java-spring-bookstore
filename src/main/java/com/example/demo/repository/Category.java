@@ -2,6 +2,7 @@ package com.example.demo.repository;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -9,13 +10,13 @@ import java.util.List;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private List<Book> books;
+    private List<Book> books = new ArrayList<>();
 
     protected Category() {
 
@@ -25,8 +26,12 @@ public class Category {
         this.name = name;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -41,7 +46,4 @@ public class Category {
         this.name = name;
     }
 
-    public void setBooks(List<Book> books) {
-        this.books = books;
-    }
 }

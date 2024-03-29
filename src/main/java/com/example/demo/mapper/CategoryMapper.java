@@ -10,6 +10,12 @@ import java.util.List;
 
 @Service
 public class CategoryMapper {
+    private final BookMapper bookMapper;
+
+    public CategoryMapper(BookMapper bookMapper) {
+        this.bookMapper = bookMapper;
+    }
+
     public CategoryGetDto categoryToCategoryGetDto(Category category) {
         final List<BookBaseGetDto> books = category
                 .getBooks()
@@ -26,5 +32,18 @@ public class CategoryMapper {
 
     public CategoryBaseGetDto categoryToCategoryBaseGetDto(Category category) {
         return new CategoryBaseGetDto(category.getId(), category.getName());
+    }
+
+    public List<CategoryGetDto> categoryListToCategoryGetDtoList(List<Category> categories) {
+        return categories
+                .stream()
+                .map(category -> new CategoryGetDto(
+                        category.getId(),
+                        category.getName(),
+                        category.getBooks()
+                                .stream()
+                                .map(book -> bookMapper.bookToBookBaseGetDto(book))
+                                .toList()))
+                .toList();
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class CategoryController {
     private final CategoryService categoryService;
@@ -18,6 +20,17 @@ public class CategoryController {
     @GetMapping("/category/{id}")
     public ResponseEntity<CategoryGetDto> getCategoryById(@PathVariable(name = "id") long id) {
         CategoryGetDto response = categoryService.getCategoryById(id);
+
+        if (response == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryGetDto>> getAllCategories() {
+        List<CategoryGetDto> response = categoryService.getAllCategories();
 
         if (response == null) {
             return ResponseEntity.notFound().build();
