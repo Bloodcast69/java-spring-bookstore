@@ -1,10 +1,8 @@
 package com.example.demo.rest;
 
-import com.example.demo.dto.BookBaseGetDto;
-import com.example.demo.dto.BookCreateDto;
-import com.example.demo.dto.BookGetDto;
-import com.example.demo.dto.BookUpdateDto;
+import com.example.demo.dto.*;
 import com.example.demo.service.BookService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +38,7 @@ public class BookController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<BookGetDto> createBook(@RequestBody BookCreateDto body) {
+    public ResponseEntity<BookGetDto> createBook(@RequestBody @Valid BookCreateDto body) {
         logger.info("Called createBook with body = {}.", body);
         BookGetDto response = bookService.createBook(body);
 
@@ -49,7 +47,7 @@ public class BookController {
     }
 
     @PutMapping("/book/{id}")
-    public ResponseEntity<BookGetDto> updateBook(@RequestBody BookUpdateDto body) {
+    public ResponseEntity<BookGetDto> updateBook(@RequestBody @Valid BookUpdateDto body) {
         logger.info("Called updateBook with body = {}.", body);
         BookGetDto response = bookService.updateBook(body);
 

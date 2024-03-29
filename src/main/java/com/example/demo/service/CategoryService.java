@@ -96,7 +96,7 @@ public class CategoryService {
         logger.info("Called deleteCategory with id = {} and body = {}.", id, body);
         Category existingCategory = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
-        if (!existingCategory.getBooks().isEmpty() && body.getForce()) {
+        if (!existingCategory.getBooks().isEmpty() && body.isForce()) {
             // remove books from category
             existingCategory.getBooks().forEach(book -> {
                 book.setCategory(null);

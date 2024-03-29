@@ -39,7 +39,7 @@ public class CategoryController {
     }
 
     @PostMapping("/category")
-    public ResponseEntity<CategoryBaseGetDto> createCategory(@RequestBody @Valid CategoryCreateDto body) {
+    public ResponseEntity<CategoryBaseGetDto> createCategory(@Valid @RequestBody CategoryCreateDto body) {
         logger.info("Called createCategory with body = {}.", body);
         CategoryBaseGetDto response = categoryService.createCategory(body);
 

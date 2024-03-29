@@ -1,10 +1,14 @@
 package com.example.demo.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
 
 @ToString
+@Getter
+@Setter
 public class CategoryGetDto extends CategoryBaseGetDto {
     private List<BookBaseGetDto> books = null;
 
@@ -13,9 +17,5 @@ public class CategoryGetDto extends CategoryBaseGetDto {
         if (books != null) {
             this.books = books;
         }
-    }
-
-    public List<BookBaseGetDto> getBooks() {
-        return books;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.demo.repository;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
@@ -9,6 +11,8 @@ import java.util.List;
 @Entity
 @Table(name = "category")
 @ToString
+@Getter
+@Setter
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,26 +30,6 @@ public class Category {
     }
 
     public Category(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<Book> getBooks() {
-        return books;
-    }
-
-    public void setName(String name) {
         this.name = name;
     }
 

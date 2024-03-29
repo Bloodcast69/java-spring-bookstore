@@ -1,28 +1,19 @@
 package com.example.demo.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.ToString;
 
 @ToString
-public class BookUpdateDto {
+public class BookUpdateDto extends BookCreateDto {
+    @NotNull(message = "Id cannot be null")
     private final long id;
-    private final String name;
-    private final long categoryId;
 
     public BookUpdateDto(long id, String name, long categoryId) {
+        super(name, categoryId);
         this.id = id;
-        this.name = name;
-        this.categoryId = categoryId;
     }
 
     public long getId() {
         return id;
-    }
-
-    public long getCategoryId() {
-        return categoryId;
-    }
-
-    public String getName() {
-        return name;
     }
 }

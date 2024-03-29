@@ -1,8 +1,12 @@
 package com.example.demo.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @ToString(callSuper = true, includeFieldNames = true)
+@Getter
+@Setter
 public class BookGetDto extends BookBaseGetDto {
     private final CategoryBaseGetDto category;
 
@@ -10,9 +14,4 @@ public class BookGetDto extends BookBaseGetDto {
         super(id, name);
         this.category = category;
     }
-
-    public CategoryBaseGetDto getCategory() {
-        return category;
-    }
-
 }

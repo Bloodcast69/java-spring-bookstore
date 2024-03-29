@@ -2,6 +2,8 @@ package com.example.demo.repository;
 
 import com.example.demo.dto.BookBaseGetDto;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @NamedNativeQuery(name = "Book.findForCategory",
@@ -16,6 +18,8 @@ import lombok.ToString;
 @Entity
 @Table(name = "book")
 @ToString
+@Getter
+@Setter
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,36 +41,8 @@ public class Book {
         this.category = category;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public void clearCategory() {
-        if (this.category == null) {
-            return;
-        }
-
-        this.category.getBooks().remove(this);
-        this.category = null;
-    }
-
     public boolean categoryIsEmpty() {
         return this.category == null;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }
