@@ -1,5 +1,8 @@
 package com.example.demo.dto;
 
+import lombok.ToString;
+
+@ToString
 public class BookUpdateDto {
     private final long id;
     private final String name;

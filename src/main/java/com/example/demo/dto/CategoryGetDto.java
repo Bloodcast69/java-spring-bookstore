@@ -1,7 +1,10 @@
 package com.example.demo.dto;
 
+import lombok.ToString;
+
 import java.util.List;
 
+@ToString
 public class CategoryGetDto extends CategoryBaseGetDto {
     private List<BookBaseGetDto> books = null;
 

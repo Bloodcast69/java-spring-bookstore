@@ -3,7 +3,9 @@ package com.example.demo.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
+import lombok.ToString;
 
+@ToString
 public class CategoryDeleteDto {
     @NotNull
     private boolean force;

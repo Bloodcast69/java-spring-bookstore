@@ -2,6 +2,7 @@ package com.example.demo.repository;
 
 import com.example.demo.dto.BookBaseGetDto;
 import jakarta.persistence.*;
+import lombok.ToString;
 
 @NamedNativeQuery(name = "Book.findForCategory",
         query = "SELECT b.id as id, b.name as name FROM book b WHERE b.category_id = :id",
@@ -14,6 +15,7 @@ import jakarta.persistence.*;
                 }))
 @Entity
 @Table(name = "book")
+@ToString
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

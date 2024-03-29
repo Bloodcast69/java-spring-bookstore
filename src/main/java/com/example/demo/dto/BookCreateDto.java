@@ -1,5 +1,8 @@
 package com.example.demo.dto;
 
+import lombok.ToString;
+
+@ToString
 public class BookCreateDto {
     private final String name;
     private final long categoryId;
