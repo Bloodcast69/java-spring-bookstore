@@ -1,9 +1,6 @@
 package com.example.demo.configuration;
 
-import com.example.demo.repository.Book;
-import com.example.demo.repository.BookRepository;
-import com.example.demo.repository.Category;
-import com.example.demo.repository.CategoryRepository;
+import com.example.demo.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +10,18 @@ import java.util.ArrayList;
 public class DatabaseSeeder {
     private final CategoryRepository categoryRepository;
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
-    public DatabaseSeeder(CategoryRepository categoryRepository, BookRepository bookRepository) {
+    public DatabaseSeeder(CategoryRepository categoryRepository, BookRepository bookRepository, UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
         this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
 
         seedDatabase();
     }
 
     @Transactional
     private void seedDatabase() {
-        ArrayList<Category> categories = new ArrayList<>();
         Category catOne = categoryRepository.save(new Category("Kryminały"));
         Category catTwo = categoryRepository.save(new Category("Romanse"));
         Category catThree = categoryRepository.save(new Category("Obyczajowe"));
@@ -45,6 +43,9 @@ public class DatabaseSeeder {
         bookRepository.save(bookTwo);
         bookRepository.save(bookThree);
         bookRepository.save(bookFour);
+
+        User userFirst = userRepository.save(new User("John", "Doe", "john.doe@example.com", "password", true));
+
 
     }
 }
