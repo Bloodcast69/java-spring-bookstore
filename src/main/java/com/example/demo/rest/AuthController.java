@@ -5,6 +5,7 @@ import com.example.demo.dto.UserCreateDto;
 import com.example.demo.dto.UserGetBaseDto;
 import com.example.demo.dto.UserLoginDto;
 import com.example.demo.service.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<UserGetBaseDto> createUser(@Valid @RequestBody UserCreateDto body) {
+    public ResponseEntity<UserGetBaseDto> createUser(@Valid @RequestBody UserCreateDto body) throws MessagingException {
         logger.info("Called createUser with body = {}.", body);
         UserGetBaseDto response = userService.createUser(body);
 

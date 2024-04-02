@@ -4,6 +4,7 @@ import com.example.demo.dto.*;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.User;
 import com.example.demo.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 @Service
@@ -22,10 +24,12 @@ public class UserService {
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final EmailServiceImpl emailService;
 
-    public UserService(UserRepository repository, UserMapper mapper) {
+    public UserService(UserRepository repository, UserMapper mapper, EmailServiceImpl emailService) {
         this.userRepository = repository;
         this.userMapper = mapper;
+        this.emailService = emailService;
     }
 
     public UserGetBaseDto getUserById(long id) {
@@ -48,7 +52,7 @@ public class UserService {
         return response;
     }
 
-    public UserGetBaseDto createUser(UserCreateDto body) {
+    public UserGetBaseDto createUser(UserCreateDto body) throws MessagingException {
         logger.info("createUser with body = {}", body);
         User entity;
 
@@ -62,6 +66,9 @@ public class UserService {
         UserGetBaseDto response = userMapper.userToUserGetBaseDto(entity);
 
         logger.info("createUser response = {}.", response);
+
+        sendAccountCreatedEmail(body.getEmail());
+
         return response;
     }
 
@@ -121,5 +128,35 @@ public class UserService {
         }
 
         return userMapper.userToUserGetBaseDto(entity);
+    }
+
+    private void sendAccountCreatedEmail(String recipient) {
+        logger.info("sendAccountCreatedEmail sending email to recipient = {}", recipient);
+        emailService.sendSimpleMail(
+                new EmailDetails(
+                        recipient,
+                        "Your account is created but it's not active yet.",
+                        "Java BookStore - account created"
+                )
+        );
+    }
+
+    private void sendEmailWithAttachments(String recipient) throws MessagingException {
+        ArrayList<EmailAttachment> attachments = new ArrayList<>();
+        attachments.add(new EmailAttachment("invoice.txt", "static_files"));
+        attachments.add(new EmailAttachment("invoice2.txt", "static_files"));
+
+        try {
+            emailService.sendMessageWithAttachment(
+                    new EmailDetails(
+                            recipient,
+                            "Your account is created but it's not active yet.",
+                            "Java BookStore - account created",
+                            attachments
+                    )
+            );
+        } catch (MessagingException e) {
+            throw new MessagingException(e.getMessage());
+        }
     }
 }
