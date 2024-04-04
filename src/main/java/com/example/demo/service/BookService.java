@@ -16,15 +16,15 @@ import java.util.List;
 
 @Service
 public class BookService {
-    private final BookRepository repository;
-    private final BookMapper mapper;
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
     private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
     private final Logger logger = LoggerFactory.getLogger(BookService.class);
 
-    public BookService(BookRepository repository, CategoryRepository categoryRepository, BookMapper mapper, CategoryService categoryService) {
-        this.repository = repository;
-        this.mapper = mapper;
+    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository, BookMapper bookMapper, CategoryService categoryService) {
+        this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
         this.categoryService = categoryService;
         this.categoryRepository = categoryRepository;
     }
@@ -32,20 +32,21 @@ public class BookService {
     @Transactional
     public BookGetDto getBookById(long id) {
         logger.info("Called getBookById with id = {}.", id);
-        Book response = repository
+        Book response = bookRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book with id " + id + " does not exist."));
 
         logger.info("getBookById response = {}.", response);
-        return mapper.bookToBookGetDto(response);
+        return bookMapper.bookToBookGetDto(response);
     }
 
     @Transactional
     public List<BookBaseGetDto> getBooksByCategoryId(long id) {
         logger.info("Called getBooksByCategoryId with id = {}.", id);
-        List<BookBaseGetDto> response = repository
+        List<BookBaseGetDto> response = bookRepository
                 .findForCategory(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
+                .stream().map(book -> bookMapper.bookToBookBaseGetDto(book))
+                .toList();
 
         logger.info("getBooksByCategoryId response = {}.", response);
         return response;
@@ -59,10 +60,10 @@ public class BookService {
         Book book = new Book(body.getName(), existingCategory);
         existingCategory.getBooks().add(book);
 
-        Book response = repository.save(book);
+        Book response = bookRepository.save(book);
 
         logger.info("createBook response = {}.", response);
-        return mapper.bookToBookGetDto(response);
+        return bookMapper.bookToBookGetDto(response);
     }
 
     @Transactional
@@ -70,22 +71,22 @@ public class BookService {
         logger.info("Called updateBook with body = {}.", body);
         Category existingCategory = categoryService.getFullCategoryById(body.getCategoryId());
 
-        Book book = repository.findById(body.getId()).orElseThrow(() -> new EntityNotFoundException("Book with id " + body.getId() + " does not exist."));
+        Book book = bookRepository.findById(body.getId()).orElseThrow(() -> new EntityNotFoundException("Book with id " + body.getId() + " does not exist."));
 
         book.setCategory(existingCategory);
         book.setName(body.getName());
         existingCategory.getBooks().add(book);
 
-        Book response = repository.save(book);
+        Book response = bookRepository.save(book);
 
         logger.info("updateBook response = {}.", response);
-        return mapper.bookToBookGetDto(response);
+        return bookMapper.bookToBookGetDto(response);
     }
 
     @Transactional
     public BookGetDto deleteBook(long id) {
         logger.info("Called deleteBook with id = {}.", id);
-        Book existingBook = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Book with id " + id + " does not exist."));
+        Book existingBook = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Book with id " + id + " does not exist."));
 
         Category existingCategory = categoryService.getFullCategoryById(existingBook.getCategory().getId());
 
@@ -93,9 +94,9 @@ public class BookService {
         categoryRepository.save(existingCategory);
 
         existingBook.setCategory(null);
-        repository.delete(existingBook);
+        bookRepository.delete(existingBook);
 
-        BookGetDto response = mapper.bookToBookGetDto(existingBook);
+        BookGetDto response = bookMapper.bookToBookGetDto(existingBook);
 
         logger.info("deleteBook response = {}.", response);
         return response;

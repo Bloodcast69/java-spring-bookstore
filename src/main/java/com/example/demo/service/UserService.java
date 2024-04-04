@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.dto.*;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.repository.Mail;
+import com.example.demo.repository.MailRepository;
 import com.example.demo.repository.User;
 import com.example.demo.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -25,11 +28,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final EmailServiceImpl emailService;
+    private final MailRepository mailRepository;
 
-    public UserService(UserRepository repository, UserMapper mapper, EmailServiceImpl emailService) {
+    public UserService(UserRepository repository, UserMapper mapper, EmailServiceImpl emailService, MailRepository mailRepository) {
         this.userRepository = repository;
         this.userMapper = mapper;
         this.emailService = emailService;
+        this.mailRepository = mailRepository;
     }
 
     public UserGetBaseDto getUserById(long id) {
@@ -67,7 +72,11 @@ public class UserService {
 
         logger.info("createUser response = {}.", response);
 
-        sendAccountCreatedEmail(body.getEmail());
+        EmailDetails emailToSendDetails = emailService.prepareRegisterConfirmationEmailToSend(response.getEmail());
+
+        Mail mailToSend = mailRepository.save(new Mail(entity, emailToSendDetails.getSubject(), emailToSendDetails.getBody()));
+
+        logger.info("createUser mail = {}, recipient = {} saved to the database.", mailToSend, mailToSend.getUser().getEmail());
 
         return response;
     }

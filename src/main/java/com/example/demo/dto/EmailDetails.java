@@ -11,19 +11,19 @@ import java.util.List;
 @ToString
 public class EmailDetails {
     private final String recipient;
-    private final String msgBody;
+    private final String body;
     private final String subject;
     private List<EmailAttachment> attachments;
 
-    public EmailDetails(String recipient, String msgBody, String subject) {
+    public EmailDetails(String recipient, String subject, String body) {
         this.recipient = recipient;
-        this.msgBody = msgBody;
+        this.body = body;
         this.subject = subject;
     }
 
-    public EmailDetails(String recipient, String msgBody, String subject, List<EmailAttachment> attachments) {
+    public EmailDetails(String recipient, String subject, String body, List<EmailAttachment> attachments) {
         this.recipient = recipient;
-        this.msgBody = msgBody;
+        this.body = body;
         this.subject = subject;
         this.attachments = attachments;
     }

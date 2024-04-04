@@ -16,32 +16,32 @@ import java.util.List;
 
 @Service
 public class CategoryService {
-    private final CategoryRepository repository;
+    private final CategoryRepository categoryRepository;
     private final BookRepository bookRepository;
-    private final CategoryMapper mapper;
+    private final CategoryMapper categoryMapper;
     private final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
-    public CategoryService(CategoryRepository repository, BookRepository bookRepository, CategoryMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
+    public CategoryService(CategoryRepository categoryRepository, BookRepository bookRepository, CategoryMapper categoryMapper) {
+        this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
         this.bookRepository = bookRepository;
     }
 
     @Transactional
     public CategoryGetDto getCategoryById(long id) {
         logger.info("Called getCategoryById with id = {}.", id);
-        Category response = repository
+        Category response = categoryRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
         logger.info("getCategoryById response = {}.", response);
-        return mapper.categoryToCategoryGetDto(response);
+        return categoryMapper.categoryToCategoryGetDto(response);
     }
 
     @Transactional
     public Category getFullCategoryById(long id) {
         logger.info("Called getFullCategoryById with id = {}.", id);
-        Category response = repository
+        Category response = categoryRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
@@ -52,7 +52,7 @@ public class CategoryService {
     @Transactional
     public List<CategoryGetDto> getAllCategories() {
         logger.info("Called getAllCategories.");
-        List<CategoryGetDto> response = mapper.categoryListToCategoryGetDtoList(repository.findAll());
+        List<CategoryGetDto> response = categoryMapper.categoryListToCategoryGetDtoList(categoryRepository.findAll());
 
         logger.info("getAllCategories response = {}.", response);
         return response;
@@ -64,12 +64,12 @@ public class CategoryService {
         Category entity;
 
         try {
-            entity = repository.save(new Category(body.getName()));
+            entity = categoryRepository.save(new Category(body.getName()));
         } catch (DataIntegrityViolationException ex) {
             throw new DataIntegrityViolationException("Category with name " + body.getName() + " already exists.");
         }
 
-        CategoryBaseGetDto response = mapper.categoryToCategoryBaseGetDto(entity);
+        CategoryBaseGetDto response = categoryMapper.categoryToCategoryBaseGetDto(entity);
 
         logger.info("getAllCategories response = {}.", response);
         return response;
@@ -78,13 +78,13 @@ public class CategoryService {
     @Transactional
     public CategoryBaseGetDto updateCategory(long id, CategoryUpdateDto body) {
         logger.info("Called updateCategory with id = {} and body = {}.", id, body);
-        Category existingCategory = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
+        Category existingCategory = categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
         existingCategory.setName(body.getName());
 
-        Category entity = repository.save(existingCategory);
+        Category entity = categoryRepository.save(existingCategory);
 
-        CategoryBaseGetDto response = mapper.categoryToCategoryBaseGetDto(entity);
+        CategoryBaseGetDto response = categoryMapper.categoryToCategoryBaseGetDto(entity);
 
         logger.info("updateCategory response = {}.", response);
         return response;
@@ -94,7 +94,7 @@ public class CategoryService {
     @Transactional
     public CategoryBaseGetDto deleteCategory(long id, CategoryDeleteDto body) {
         logger.info("Called deleteCategory with id = {} and body = {}.", id, body);
-        Category existingCategory = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
+        Category existingCategory = categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " does not exist."));
 
         if (!existingCategory.getBooks().isEmpty() && body.isForce()) {
             // remove books from category
@@ -105,9 +105,9 @@ public class CategoryService {
 
             existingCategory.getBooks().clear();
         }
-        repository.delete(existingCategory);
+        categoryRepository.delete(existingCategory);
 
-        CategoryBaseGetDto response = mapper.categoryToCategoryBaseGetDto(existingCategory);
+        CategoryBaseGetDto response = categoryMapper.categoryToCategoryBaseGetDto(existingCategory);
 
         logger.info("updateCategory response = {}.", response);
         return response;

@@ -7,4 +7,6 @@ public interface EmailService {
     void sendSimpleMail(EmailDetails details);
 
     void sendMessageWithAttachment(EmailDetails details) throws MessagingException;
+
+    EmailDetails prepareRegisterConfirmationEmailToSend(String recipient);
 }

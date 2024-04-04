@@ -1,21 +1,13 @@
 package com.example.demo.repository;
 
-import com.example.demo.dto.BookBaseGetDto;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@NamedNativeQuery(name = "Book.findForCategory",
-        query = "SELECT b.id as id, b.name as name FROM book b WHERE b.category_id = :id",
-        resultSetMapping = "Mapping.BookBaseGetDto")
-@SqlResultSetMapping(name = "Mapping.BookBaseGetDto",
-        classes = @ConstructorResult(targetClass = BookBaseGetDto.class,
-                columns = {
-                        @ColumnResult(name = "id"),
-                        @ColumnResult(name = "name"),
-                }))
 @Entity
+@EqualsAndHashCode(exclude = "category")
 @Table(name = "book")
 @ToString
 @Getter
