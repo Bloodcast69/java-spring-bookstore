@@ -1,9 +1,6 @@
 package com.example.demo.rest;
 
-import com.example.demo.dto.UserActivateDto;
-import com.example.demo.dto.UserCreateDto;
-import com.example.demo.dto.UserGetBaseDto;
-import com.example.demo.dto.UserLoginDto;
+import com.example.demo.dto.*;
 import com.example.demo.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -48,5 +45,21 @@ public class AuthController {
 
         logger.info("loginUser response = {}.", response);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/auth/password/reset")
+    public ResponseEntity<String> resetPasswordInit(@RequestBody UserPasswordResetInit body) {
+        logger.info("Called resetPasswordInit with body = {}.", body);
+//        userService.changeUserPasswordInit(body);
+
+        return ResponseEntity.ok(body.getEmail());
+    }
+
+    @PostMapping("/auth/password/reset/do")
+    public ResponseEntity resetPassword(@Valid @RequestBody UserPasswordReset body) {
+        logger.info("Called resetPassword with body = {}.", body);
+        userService.changeUserPassword(body);
+
+        return ResponseEntity.noContent().build();
     }
 }

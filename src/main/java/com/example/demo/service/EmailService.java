@@ -13,9 +13,17 @@ public interface EmailService {
 
     void sendAccountBlockedEmail(Mail mail);
 
+    void sendUserPasswordResetInitEmail(Mail mail);
+
+    void sendUserPasswordResetEmail(Mail mail);
+
     EmailDetails prepareCreateAccountConfirmEmailToSend(String recipient);
 
     EmailDetails prepareAccountConfirmationEmailToSend(String recipient);
 
     EmailDetails prepareAccountBlockedEmailToSend(String recipient);
+
+    EmailDetails prepareUserPasswordResetInitEmailToSend(String recipient);
+
+    EmailDetails prepareUserPasswordResetEmailToSend(String recipient);
 }

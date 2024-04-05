@@ -53,6 +53,8 @@ public class User {
 
     private AccountBlockReason blockReason;
 
+    private Timestamp blockedOn;
+
     protected User() {
 
     }

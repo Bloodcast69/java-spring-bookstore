@@ -84,6 +84,20 @@ public class EmailServiceImpl implements EmailService {
         sendAndRemoveEmail(mail);
     }
 
+    @Transactional
+    public void sendUserPasswordResetInitEmail(Mail mail) {
+        logger.info("sendUserPasswordResetInitEmail sending email to recipient = {}", mail.getUser().getEmail());
+
+        sendAndRemoveEmail(mail);
+    }
+
+    @Transactional
+    public void sendUserPasswordResetEmail(Mail mail) {
+        logger.info("sendUserPasswordResetEmail sending email to recipient = {}", mail.getUser().getEmail());
+
+        sendAndRemoveEmail(mail);
+    }
+
     public EmailDetails prepareCreateAccountConfirmEmailToSend(String recipient) {
         return new EmailDetails(recipient, "Java BookStore - account created", "Your account is created but it's not active yet.");
     }
@@ -94,6 +108,14 @@ public class EmailServiceImpl implements EmailService {
 
     public EmailDetails prepareAccountBlockedEmailToSend(String recipient) {
         return new EmailDetails(recipient, "Java BookStore - account is blocked", "Your account is blocked due to exceed invalid login attempts. Please reset your password.");
+    }
+
+    public EmailDetails prepareUserPasswordResetInitEmailToSend(String recipient) {
+        return new EmailDetails(recipient, "Java BookStore - password reset initiation", "You have initiated password reset process.");
+    }
+
+    public EmailDetails prepareUserPasswordResetEmailToSend(String recipient) {
+        return new EmailDetails(recipient, "Java BookStore - password reset successful", "You password has been reset and account is unblocked.");
     }
 
     private void sendAndRemoveEmail(Mail mail) {

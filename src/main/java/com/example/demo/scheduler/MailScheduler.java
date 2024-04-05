@@ -47,6 +47,14 @@ public class MailScheduler {
                     emailService.sendAccountBlockedEmail(mail);
                     break;
                 }
+                case PASSWORD_RESET_INIT -> {
+                    emailService.sendUserPasswordResetInitEmail(mail);
+                    break;
+                }
+                case PASSWORD_RESET_SUCCESS -> {
+                    emailService.sendUserPasswordResetEmail(mail);
+                    break;
+                }
                 default -> logger.info("sendEmails no emails for specified types");
             }
         });

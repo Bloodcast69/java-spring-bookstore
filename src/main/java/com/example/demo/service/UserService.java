@@ -148,6 +148,7 @@ public class UserService {
             if (entity.getInvalidLoginAttempts() == 5) {
                 entity.setAccountBlocked(true);
                 entity.setBlockReason(AccountBlockReason.EXCEED_LOGIN_LIMIT);
+                entity.setBlockedOn(new Timestamp(new Date().getTime()));
                 EmailDetails emailToSendDetails = emailService.prepareAccountBlockedEmailToSend(body.getEmail());
 
                 Mail mailToSend = mailRepository.save(new Mail(entity, emailToSendDetails.getSubject(), emailToSendDetails.getBody(), MailType.ACCOUNT_BLOCKED_BY_LOGIN_LIMIT));
@@ -178,5 +179,64 @@ public class UserService {
         logger.info("loginUser User = {} logged in.", loggedUser);
 
         return userMapper.userToUserGetBaseDto(loggedUser);
+    }
+
+    public void changeUserPasswordInit(UserPasswordResetInit body) {
+        logger.info("changeUserPasswordInit with body = {}", body);
+        User entity = userRepository.findByEmail(body.getEmail()).orElseThrow(() -> {
+            logger.info("changeUserPasswordInit user with email = {} does not exist.", body.getEmail());
+
+            return new DataIntegrityViolationException("Invalid email and/or password.");
+        });
+
+        if (entity.isAccountBlocked() || !entity.isActivated()) {
+            logger.info("changeUserPasswordInit user with email = {} is blocked = {} and is activated = {}.", body.getEmail(), entity.isAccountBlocked(), entity.isActivated());
+        }
+
+        entity.setAccountBlocked(true);
+        entity.setBlockReason(AccountBlockReason.PASSWORD_RESET_PROCESS);
+        entity.setBlockedOn(new Timestamp(new Date().getTime()));
+
+        User response = userRepository.save(entity);
+
+        logger.info("changeUserPasswordInit password change initiated for email = {}", response.getEmail());
+
+        EmailDetails emailToSendDetails = emailService.prepareUserPasswordResetInitEmailToSend(response.getEmail());
+
+        Mail mailToSend = mailRepository.save(new Mail(entity, emailToSendDetails.getSubject(), emailToSendDetails.getBody(), MailType.PASSWORD_RESET_INIT));
+
+        logger.info("changeUserPasswordInit mail = {}, recipient = {} saved to the database.", mailToSend, mailToSend.getUser().getEmail());
+    }
+
+    public void changeUserPassword(UserPasswordReset body) {
+        logger.info("changeUserPasswordInit with body = {}", body);
+        User entity = userRepository.findByEmail(body.getEmail()).orElseThrow(() -> {
+            logger.info("changeUserPasswordInit user with email = {} does not exist.", body.getEmail());
+
+            throw new DataIntegrityViolationException("Invalid email and/or password.");
+        });
+
+        if ((entity.isAccountBlocked() && entity.getBlockReason() != AccountBlockReason.PASSWORD_RESET_PROCESS) || !entity.isActivated()) {
+            logger.info("changeUserPasswordInit user with email = {} is blocked = {} with blockReason = {} and is activated = {}.", body.getEmail(), entity.isAccountBlocked(), entity.getBlockReason(), entity.isActivated());
+        }
+
+        if (!Objects.equals(entity.getPassword(), body.getPasswordConfirm())) {
+            logger.info("changeUserPasswordInit password and confirmPassword does not match.");
+        }
+
+        entity.setPassword(body.getPassword());
+        entity.setAccountBlocked(false);
+        entity.setBlockReason(null);
+        entity.setBlockedOn(null);
+
+        User response = userRepository.save(entity);
+
+        logger.info("changeUserPassword password for user = {} was changed and account is unblocked.", entity);
+
+        EmailDetails emailToSendDetails = emailService.prepareUserPasswordResetEmailToSend(body.getEmail());
+
+        Mail mailToSend = mailRepository.save(new Mail(response, emailToSendDetails.getSubject(), emailToSendDetails.getBody(), MailType.PASSWORD_RESET_SUCCESS));
+
+        logger.info("changeUserPassword mail = {}, recipient = {} saved to the database.", mailToSend, mailToSend.getUser().getEmail());
     }
 }
