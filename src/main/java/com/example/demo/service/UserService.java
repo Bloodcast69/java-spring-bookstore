@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.constants.AccountBlockReason;
 import com.example.demo.constants.MailType;
 import com.example.demo.dto.*;
 import com.example.demo.mapper.UserMapper;
@@ -17,6 +18,8 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @Service
@@ -128,17 +131,52 @@ public class UserService {
         return response;
     }
 
-    public UserGetBaseDto loginUser(UserLoginDto body) {
+    public UserGetBaseDto loginUser(UserLoginDto body) throws Exception {
         logger.info("loginUser with body = {}", body);
         User entity = userRepository.findByEmail(body.getEmail()).orElseThrow(() -> {
-            logger.info("User with email = {} does not exist.", body.getEmail());
+            logger.info("loginUser User with email = {} does not exist.", body.getEmail());
             return new AuthenticationServiceException("Invalid email and/or password.");
         });
 
-        if (!Objects.equals(entity.getPassword(), body.getPassword()) || !entity.isActivated()) {
+        if (entity.isAccountBlocked()) {
+            logger.info("loginUser user = {} is blocked.", entity);
+
+            throw new AuthenticationServiceException("Account is blocked.");
+        }
+
+        if (!Objects.equals(entity.getPassword(), body.getPassword())) {
+            if (entity.getInvalidLoginAttempts() == 5) {
+                entity.setAccountBlocked(true);
+                entity.setBlockReason(AccountBlockReason.EXCEED_LOGIN_LIMIT);
+                EmailDetails emailToSendDetails = emailService.prepareAccountBlockedEmailToSend(body.getEmail());
+
+                Mail mailToSend = mailRepository.save(new Mail(entity, emailToSendDetails.getSubject(), emailToSendDetails.getBody(), MailType.ACCOUNT_BLOCKED_BY_LOGIN_LIMIT));
+                logger.info("loginUser mail = {}, recipient = {} saved to the database.", mailToSend, body.getEmail());
+            } else {
+                entity.setInvalidLoginAttempts(entity.getInvalidLoginAttempts() + 1);
+            }
+
+            User updatedEntity = userRepository.save(entity);
+
+            logger.info("loginUser invalid login try for user = {}.", updatedEntity);
+
             throw new AuthenticationServiceException("Invalid email and/or password.");
         }
 
-        return userMapper.userToUserGetBaseDto(entity);
+        if (!entity.isActivated()) {
+            logger.info("loginUser user = {} is not activated.", entity);
+
+            throw new AuthenticationServiceException("Invalid email and/or password.");
+        }
+
+        entity.setInvalidLoginAttempts(0);
+
+        entity.setLastLoggedIn(new Timestamp(new Date().getTime()));
+
+        User loggedUser = userRepository.save(entity);
+
+        logger.info("loginUser User = {} logged in.", loggedUser);
+
+        return userMapper.userToUserGetBaseDto(loggedUser);
     }
 }

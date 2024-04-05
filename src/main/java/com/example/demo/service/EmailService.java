@@ -10,7 +10,12 @@ public interface EmailService {
     void sendAccountCreatedEmail(Mail mail);
 
     void sendAccountConfirmedEmail(Mail mail);
+
+    void sendAccountBlockedEmail(Mail mail);
+
     EmailDetails prepareCreateAccountConfirmEmailToSend(String recipient);
 
     EmailDetails prepareAccountConfirmationEmailToSend(String recipient);
+
+    EmailDetails prepareAccountBlockedEmailToSend(String recipient);
 }

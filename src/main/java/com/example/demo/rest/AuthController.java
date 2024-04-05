@@ -42,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<UserGetBaseDto> loginUser(@RequestBody UserLoginDto body) {
+    public ResponseEntity<UserGetBaseDto> loginUser(@RequestBody UserLoginDto body) throws Exception {
         logger.info("Called loginUser with body = {}.", body);
         UserGetBaseDto response = userService.loginUser(body);
 

@@ -30,7 +30,6 @@ public class EmailServiceImpl implements EmailService {
 
     public void sendSimpleMail(Mail mail) {
         logger.info("Called sendSimpleMail with details = {}", mail);
-        logger.info("SENDER NAME: {}", sender);
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(sender);
@@ -77,12 +76,24 @@ public class EmailServiceImpl implements EmailService {
 
         sendAndRemoveEmail(mail);
     }
+
+    @Transactional
+    public void sendAccountBlockedEmail(Mail mail) {
+        logger.info("sendAccountBlockedEmail sending email to recipient = {}", mail.getUser().getEmail());
+
+        sendAndRemoveEmail(mail);
+    }
+
     public EmailDetails prepareCreateAccountConfirmEmailToSend(String recipient) {
         return new EmailDetails(recipient, "Java BookStore - account created", "Your account is created but it's not active yet.");
     }
 
     public EmailDetails prepareAccountConfirmationEmailToSend(String recipient) {
         return new EmailDetails(recipient, "Java BookStore - account confirmed", "Your account is confirmed and active.");
+    }
+
+    public EmailDetails prepareAccountBlockedEmailToSend(String recipient) {
+        return new EmailDetails(recipient, "Java BookStore - account is blocked", "Your account is blocked due to exceed invalid login attempts. Please reset your password.");
     }
 
     private void sendAndRemoveEmail(Mail mail) {

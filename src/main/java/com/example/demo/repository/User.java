@@ -1,11 +1,14 @@
 package com.example.demo.repository;
 
+import com.example.demo.constants.AccountBlockReason;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +42,16 @@ public class User {
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
     List<Mail> mails = new ArrayList<>();
+
+    private Timestamp lastLoggedIn;
+
+    @Column(nullable = false)
+    private int invalidLoginAttempts = 0;
+
+    @Column(nullable = false)
+    private boolean accountBlocked = false;
+
+    private AccountBlockReason blockReason;
 
     protected User() {
 

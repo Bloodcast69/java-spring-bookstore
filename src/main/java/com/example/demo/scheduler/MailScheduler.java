@@ -43,11 +43,12 @@ public class MailScheduler {
                     emailService.sendAccountConfirmedEmail(mail);
                     break;
                 }
-                default -> {
-                    logger.info("sendEmails no emails for specified types");
+                case ACCOUNT_BLOCKED_BY_LOGIN_LIMIT -> {
+                    emailService.sendAccountBlockedEmail(mail);
+                    break;
                 }
+                default -> logger.info("sendEmails no emails for specified types");
             }
-
         });
     }
 }
