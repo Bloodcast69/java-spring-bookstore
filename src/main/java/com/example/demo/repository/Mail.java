@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import com.example.demo.constants.MailType;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,15 +26,18 @@ public class Mail {
     private String subject;
     @Column(nullable = false)
     private String body;
+    @Column(nullable = false)
+    private MailType emailType;
 
     protected Mail() {
 
     }
 
-    public Mail(User user, String subject, String body) {
+    public Mail(User user, String subject, String body, MailType emailType) {
         this.user = user;
         this.subject = subject;
         this.body = body;
+        this.emailType = emailType;
     }
 
 }

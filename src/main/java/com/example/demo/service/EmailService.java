@@ -1,12 +1,16 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.EmailDetails;
-import jakarta.mail.MessagingException;
+import com.example.demo.repository.Mail;
 
 public interface EmailService {
-    void sendSimpleMail(EmailDetails details);
+    void sendSimpleMail(Mail mail);
 
-    void sendMessageWithAttachment(EmailDetails details) throws MessagingException;
 
-    EmailDetails prepareRegisterConfirmationEmailToSend(String recipient);
+    void sendAccountCreatedEmail(Mail mail);
+
+    void sendAccountConfirmedEmail(Mail mail);
+    EmailDetails prepareCreateAccountConfirmEmailToSend(String recipient);
+
+    EmailDetails prepareAccountConfirmationEmailToSend(String recipient);
 }

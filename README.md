@@ -1,28 +1,12 @@
-Services:
-1. Book: http://localhost:8080/book
+1. API Documentation: http://localhost:8080/swagger-ui/index.html
 
-2. Category: http://localhost:8080/category
 
-Endpoints:
-1. Book:
+2. Sending real emails:
+   - Uncomment spring.mail.host=smtp.gmail.com
+   - Uncomment spring.mail.port=587
+   - Comment spring.mail.host=127.0.0.1
+   - Comment spring.mail.port=1025
+   
 
-   1. GET http://localhost:8080/book/{id} - getBookById
-   
-   2. GET http://localhost:8080/books/{id} - getBooksByCategoryId
-   
-   3. POST TBD
-   
-   4. PUT TBD
-   
-   5. DELETE TBD
-   
-2. Category:
-
-   1. GET http://localhost:8080/category/{id} - getCategoryById
-   
-   2. POST http://localhost:8080/category - createCategory
-   
-   3. PUT http://localhost:8080/category/{id} - updateCategory
-   
-   4. DELETE http://localhost:8080/category/{id} - deleteCategory
-   
+3. Sending emails to MailCatcher:
+   - Start MailCatcher docker container https://hub.docker.com/r/dockage/mailcatcher

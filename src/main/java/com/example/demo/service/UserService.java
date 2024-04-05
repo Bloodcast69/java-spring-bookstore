@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.constants.MailType;
 import com.example.demo.dto.*;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.Mail;
@@ -12,14 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -72,9 +69,9 @@ public class UserService {
 
         logger.info("createUser response = {}.", response);
 
-        EmailDetails emailToSendDetails = emailService.prepareRegisterConfirmationEmailToSend(response.getEmail());
+        EmailDetails emailToSendDetails = emailService.prepareCreateAccountConfirmEmailToSend(response.getEmail());
 
-        Mail mailToSend = mailRepository.save(new Mail(entity, emailToSendDetails.getSubject(), emailToSendDetails.getBody()));
+        Mail mailToSend = mailRepository.save(new Mail(entity, emailToSendDetails.getSubject(), emailToSendDetails.getBody(), MailType.ACCOUNT_CREATED));
 
         logger.info("createUser mail = {}, recipient = {} saved to the database.", mailToSend, mailToSend.getUser().getEmail());
 
@@ -122,6 +119,12 @@ public class UserService {
         UserGetBaseDto response = userMapper.userToUserGetBaseDto(userRepository.save(entity));
         logger.info("changeUserActivationStatus response = {}.", response);
 
+        EmailDetails emailToSendDetails = emailService.prepareAccountConfirmationEmailToSend(response.getEmail());
+
+        Mail mailToSend = mailRepository.save(new Mail(entity, emailToSendDetails.getSubject(), emailToSendDetails.getBody(), MailType.ACCOUNT_CONFIRMED));
+
+        logger.info("changeUserActivationStatus mail = {}, recipient = {} saved to the database.", mailToSend, mailToSend.getUser().getEmail());
+
         return response;
     }
 
@@ -137,35 +140,5 @@ public class UserService {
         }
 
         return userMapper.userToUserGetBaseDto(entity);
-    }
-
-    private void sendAccountCreatedEmail(String recipient) {
-        logger.info("sendAccountCreatedEmail sending email to recipient = {}", recipient);
-        emailService.sendSimpleMail(
-                new EmailDetails(
-                        recipient,
-                        "Your account is created but it's not active yet.",
-                        "Java BookStore - account created"
-                )
-        );
-    }
-
-    private void sendEmailWithAttachments(String recipient) throws MessagingException {
-        ArrayList<EmailAttachment> attachments = new ArrayList<>();
-        attachments.add(new EmailAttachment("invoice.txt", "static_files"));
-        attachments.add(new EmailAttachment("invoice2.txt", "static_files"));
-
-        try {
-            emailService.sendMessageWithAttachment(
-                    new EmailDetails(
-                            recipient,
-                            "Your account is created but it's not active yet.",
-                            "Java BookStore - account created",
-                            attachments
-                    )
-            );
-        } catch (MessagingException e) {
-            throw new MessagingException(e.getMessage());
-        }
     }
 }

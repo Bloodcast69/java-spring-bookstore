@@ -1,9 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.EmailAttachment;
 import com.example.demo.dto.EmailDetails;
+import com.example.demo.repository.Mail;
+import com.example.demo.repository.MailRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,30 +15,31 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
     private final String sender;
+    private final MailRepository mailRepository;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender, @Value("${spring.mail.username") String sender) {
+    public EmailServiceImpl(JavaMailSender javaMailSender, @Value("${spring.mail.username}") String sender, MailRepository mailRepository) {
         this.javaMailSender = javaMailSender;
         this.sender = sender;
+        this.mailRepository = mailRepository;
     }
 
-    public void sendSimpleMail(EmailDetails details) {
-        logger.info("Called sendSimpleMail with details = {}", details);
+    public void sendSimpleMail(Mail mail) {
+        logger.info("Called sendSimpleMail with details = {}", mail);
+        logger.info("SENDER NAME: {}", sender);
 
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setFrom(sender);
-        mail.setTo(details.getRecipient());
-        mail.setSubject(details.getSubject());
-        mail.setText(details.getBody());
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom(sender);
+        simpleMailMessage.setTo(mail.getUser().getEmail());
+        simpleMailMessage.setSubject(mail.getSubject());
+        simpleMailMessage.setText(mail.getBody());
 
-        javaMailSender.send(mail);
-        logger.info("sendSimpleMail email sent with details = {}", details);
+        javaMailSender.send(simpleMailMessage);
+        logger.info("sendSimpleMail email sent with details = {}", mail);
     }
 
     public void sendMessageWithAttachment(EmailDetails details) throws MessagingException {
@@ -61,10 +64,30 @@ public class EmailServiceImpl implements EmailService {
         javaMailSender.send(message);
     }
 
-    public EmailDetails prepareRegisterConfirmationEmailToSend(String recipient) {
-//        ArrayList<EmailAttachment> attachments = new ArrayList<>();
-//        attachments.add(new EmailAttachment("invoice.txt", "static_files"));
-//        attachments.add(new EmailAttachment("invoice2.txt", "static_files"));
+    @Transactional
+    public void sendAccountCreatedEmail(Mail mail) {
+        logger.info("sendAccountCreatedEmail sending email to recipient = {}", mail.getUser().getEmail());
+
+        sendAndRemoveEmail(mail);
+    }
+
+    @Transactional
+    public void sendAccountConfirmedEmail(Mail mail) {
+        logger.info("sendAccountConfirmedEmail sending email to recipient = {}", mail.getUser().getEmail());
+
+        sendAndRemoveEmail(mail);
+    }
+    public EmailDetails prepareCreateAccountConfirmEmailToSend(String recipient) {
         return new EmailDetails(recipient, "Java BookStore - account created", "Your account is created but it's not active yet.");
+    }
+
+    public EmailDetails prepareAccountConfirmationEmailToSend(String recipient) {
+        return new EmailDetails(recipient, "Java BookStore - account confirmed", "Your account is confirmed and active.");
+    }
+
+    private void sendAndRemoveEmail(Mail mail) {
+        sendSimpleMail(mail);
+
+        mailRepository.delete(mail);
     }
 }
